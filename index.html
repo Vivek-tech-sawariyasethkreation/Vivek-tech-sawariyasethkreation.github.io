@@ -148,7 +148,11 @@ footer a{display:block;margin:4px 0}footer a:hover{color:var(--gold2)}
 .course .acts{display:flex;gap:8px}.course .acts .btn{flex:1;padding:10px;font-size:13px;text-align:center}
 .btn-mar{background:var(--maroon);color:#fff}
 /* shop */
-.filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
+.filters{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
+.filters button small{opacity:.7;font-size:11px}
+.search{max-width:520px;margin:0 auto 16px}.search input{background:#2a0609;color:#fff;border:1px solid var(--gold);border-radius:30px;padding:12px 20px}.search input::placeholder{color:#c9b38a}
+.gem .ph{width:100%;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:#fff;margin-bottom:12px}.gem .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.gem{display:flex;flex-direction:column}.gem .row2{margin-top:auto;padding-top:10px}
 .filters button{background:transparent;border:1px solid var(--gold);color:var(--gold2);padding:7px 16px;border-radius:20px;cursor:pointer;font-family:inherit}
 .filters button.on{background:var(--gold);color:var(--deep)}
 .gem select{width:100%;margin:6px 0 10px;padding:7px;background:#2a0609;color:#f3d27a;border:1px solid #6b4a1a;border-radius:6px}
@@ -250,9 +254,11 @@ footer a{display:block;margin:4px 0}footer a:hover{color:var(--gold2)}
 </div></section>
 
 <section class="gems" id="gemstones"><div class="wrap">
- <div class="head"><small>100% natural &amp; original</small><h2>Shop Gemstones, Crystals &amp; Bracelets</h2><div class="line"></div><p style="color:#e6c98a">Lab-certified, purity assured — recommended only after studying your chart.</p></div>
+ <div class="head"><small>100% natural &amp; original</small><h2>Shop Gemstones &amp; Crystals</h2><div class="line"></div><p style="color:#e6c98a">Gemstones, crystal bracelets, trees, pyramids, towers, angels, salt lamps &amp; more — message us on WhatsApp for prices.</p></div>
+ <div class="search"><input id="q" placeholder="Search crystals, bracelets, stones…" oninput="q=this.value;shown=24;renderShop()"></div>
  <div class="filters" id="filters"></div>
  <div class="grid" id="gemgrid"></div>
+ <div style="text-align:center;margin-top:26px"><button id="more" class="btn btn-gold" onclick="shown+=24;renderShop()">Show more</button></div>
  <div class="badges"><span>💎 Lab Certified</span><span>✔ Purity Assured</span><span>🪔 Energised Before Delivery</span><span>🚚 Delivery Across India</span></div>
 </div></section>
 
@@ -335,64 +341,40 @@ const courses=[
 document.getElementById('coursegrid').innerHTML=courses.map((c,i)=>`<div class="course"><div class="top"><span class="lv">${c.lv}</span><div class="em">${c.e}</div><h3>${c.n}</h3></div><div class="bd"><div class="meta">🗓 ${c.d}</div><ul>${c.pts.map(x=>`<li>${x}</li>`).join('')}</ul>${SHOW_PRICES?`<div class="price"><b>${inr(c.p)}</b><s>${inr(c.mrp)}</s><span class="off">${Math.round(100-c.p/c.mrp*100)}% off</span></div>`:`<div class="price"><b style="font-size:16px">Ask for fees</b></div>`}<div class="acts"><button class="btn btn-gold" onclick="addCourse(${i})">${SHOW_PRICES?"Add to cart":"Add to list"}</button><a class="btn btn-mar" target="_blank" href="${wa("Namaste, I want to enrol in "+c.n+". Please share fees and next batch details.")}">Enrol now</a></div></div></div>`).join('');
 
 /* ---- SHOP (edit prices here: price per carat/ratti, or fixed price) ---- */
-const CH=["#c62828","#ef6c00","#f9d423","#2e7d32","#1e88e5","#3949ab","#8e24aa"];
-/* ---- SHOP: edit names / prices here. price:null shows "Ask for price" ---- */
-const shop=[
- /* Gemstones (price per ratti on request) */
- {n:"Ruby",h:"माणिक्य",d:"Planet: Sun",c:"#c0142c",cat:"Gemstones",ratti:1,price:null},
- {n:"Pukhraj (Yellow Sapphire)",h:"पुखराज",d:"Planet: Jupiter",c:"#f2c230",cat:"Gemstones",ratti:1,price:null},
- {n:"Emerald",h:"पन्ना",d:"Planet: Mercury",c:"#118a4c",cat:"Gemstones",ratti:1,price:null},
- {n:"Neelam (Blue Sapphire)",h:"नीलम",d:"Planet: Saturn",c:"#1d3fa8",cat:"Gemstones",ratti:1,price:null},
- {n:"Pearl",h:"मोती",d:"Planet: Moon",c:"#f4eee0",cat:"Gemstones",ratti:1,price:null},
- {n:"Moonga (Red Coral)",h:"मूंगा",d:"Planet: Mars",c:"#e2533a",cat:"Gemstones",ratti:1,price:null},
- {n:"Gomed (Hessonite)",h:"गोमेद",d:"Planet: Rahu",c:"#a8571f",cat:"Gemstones",ratti:1,price:null},
- {n:"Cat's Eye",h:"लहसुनिया",d:"Planet: Ketu",c:"#b9a35a",cat:"Gemstones",ratti:1,price:null},
- {n:"Turquoise",h:"फ़िरोज़ा",d:"Protection",c:"#3cc2bd",cat:"Gemstones",ratti:1,price:null},
- {n:"Diamond",h:"हीरा",d:"Planet: Venus",c:"#e8f2ff",cat:"Gemstones",ratti:1,price:null},
- /* Crystal bracelets – 8mm beads */
- {n:"Black Obsidian Bracelet",d:"Protection & grounding",b:["#0b0b0b","#262626"],cat:"Crystal Bracelets",price:null},
- {n:"Labradorite Bracelet",d:"Intuition & transformation",b:["#7d8f99","#5f727d","#a7b6bd"],cat:"Crystal Bracelets",price:null},
- {n:"7 Chakra Bracelet",d:"Chakra balance & energy",b:CH,cat:"Crystal Bracelets",price:null},
- {n:"Blood Stone Bracelet",d:"Courage & vitality",b:["#3b1010","#5e1b1b","#2a0b0b"],cat:"Crystal Bracelets",price:null},
- {n:"Sunstone Bracelet",d:"Confidence & positivity",b:["#d4846a","#e5a289"],cat:"Crystal Bracelets",price:null},
- {n:"Blue Tiger Eye Bracelet",d:"Calm & clear communication",b:["#0d4f8b","#1b72b5","#09345e"],cat:"Crystal Bracelets",price:null},
- {n:"Red Tiger Eye Bracelet",d:"Motivation & willpower",b:["#5a1010","#8b2b1a","#3e0b0b"],cat:"Crystal Bracelets",price:null},
- {n:"Green Tiger Eye Bracelet",d:"Growth & prosperity",b:["#0f5a2a","#1f8a45","#0a3d1d"],cat:"Crystal Bracelets",price:null},
- {n:"Triple Protection Bracelet",d:"Hematite, Tiger Eye & Obsidian",b:["#3b3b42","#8b5a2b","#111"],cat:"Crystal Bracelets",price:null},
- {n:"Sodalite Bracelet",d:"Peace of mind & focus",b:["#2b3f7a","#4b609f","#8090c0"],cat:"Crystal Bracelets",price:null},
- {n:"Hematite Bracelet",d:"Grounding & balance",b:["#3d3d44","#5a5a63"],cat:"Crystal Bracelets",price:null},
- {n:"Tiger Eye Bracelet",d:"Courage & success",b:["#8b5a1e","#b07a2e","#6b4214"],cat:"Crystal Bracelets",price:null},
- {n:"Rose Quartz Bracelet",d:"Love & relationships",b:["#f3c6d0","#e9b0bf"],cat:"Crystal Bracelets",price:null},
- {n:"Black Onyx Bracelet",d:"Strength & protection",b:["#0d0d0d","#1f1f1f"],cat:"Crystal Bracelets",price:null},
- {n:"Yellow Aventurine Bracelet",d:"Optimism & luck",b:["#e3a93f","#efc463"],cat:"Crystal Bracelets",price:null},
- {n:"Golden Pyrite Bracelet",d:"Wealth & business",b:["#b8954a","#d6b468"],cat:"Crystal Bracelets",price:null},
- {n:"Goldstone Bracelet",d:"Ambition & drive",b:["#9a4a28","#b9653c"],cat:"Crystal Bracelets",price:null},
- {n:"Opalite Bracelet",d:"Calm & harmony",b:["#e3edf8","#c7d9ee"],cat:"Crystal Bracelets",price:null},
- {n:"Turquoise Powder Bracelet",d:"Healing & protection",b:["#d8eadf","#acd0bb"],cat:"Crystal Bracelets",price:null},
- {n:"Lava with 7 Chakra Bracelet",d:"Grounding & chakra balance",b:["#222","#2c2c2c","#222","#2c2c2c"].concat(CH),cat:"Crystal Bracelets",price:null},
- /* Crystals & spiritual products */
- {n:"7 Chakra Tree",d:"Crystal tree for home & office",e:"🌳",cat:"Crystals & Gifts",price:null},
- {n:"Amethyst Chips Bracelet",d:"Calm & spiritual growth",b:["#7b4fa0","#9b6fc0","#5e3a80"],cat:"Crystals & Gifts",price:null},
- {n:"Rose Quartz Ring",d:"Raw stone, wire-wrapped",e:"💍",cat:"Crystals & Gifts",price:null},
- {n:"Raw Crystal Pendants",d:"Natural crystals on a chain",e:"📿",cat:"Crystals & Gifts",price:null},
- {n:"Citrine Raw Stones",d:"Abundance & positivity",e:"💛",cat:"Crystals & Gifts",price:null},
- {n:"Love Mojo Bag",d:"Herbs & crystals for love",e:"👝",cat:"Oils & Mojo Bags",price:null},
- {n:"Money Oil",d:"Ritual oil for prosperity",e:"🧴",cat:"Oils & Mojo Bags",price:null},
- {n:"Manifestation Oil",d:"Ritual oil with dried flowers",e:"🌸",cat:"Oils & Mojo Bags",price:null}
+/* ---- SHOP: product list. Prices are not shown ("Ask for price"). ---- */
+const GEMS=[
+ {n:"Ruby",h:"माणिक्य",d:"Planet: Sun",c:"#c0142c"},{n:"Pukhraj (Yellow Sapphire)",h:"पुखराज",d:"Planet: Jupiter",c:"#f2c230"},
+ {n:"Emerald",h:"पन्ना",d:"Planet: Mercury",c:"#118a4c"},{n:"Neelam (Blue Sapphire)",h:"नीलम",d:"Planet: Saturn",c:"#1d3fa8"},
+ {n:"Pearl",h:"मोती",d:"Planet: Moon",c:"#f4eee0"},{n:"Moonga (Red Coral)",h:"मूंगा",d:"Planet: Mars",c:"#e2533a"},
+ {n:"Gomed (Hessonite)",h:"गोमेद",d:"Planet: Rahu",c:"#a8571f"},{n:"Cat's Eye",h:"लहसुनिया",d:"Planet: Ketu",c:"#b9a35a"},
+ {n:"Turquoise",h:"फ़िरोज़ा",d:"Protection",c:"#3cc2bd"},{n:"Diamond",h:"हीरा",d:"Planet: Venus",c:"#e8f2ff"}
+].map(g=>({...g,cat:"Gemstones",ratti:1}));
+const slug=x=>x.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+/* [category, details, name suffix, [names]] – photo file = img/<name-as-slug>.jpg */
+const CATALOG=[["Crystal Bracelets","8mm beads"," Bracelet",["Tiger Eye","Black Onyx","Golden Pyrite","Opalite","Hematite","Rose Quartz","Yellow Aventurine","Goldstone","Lava with 7 Chakra","Turquoise Powder","Green Aventurine","Amethyst","Clear Quartz","Rhodonite","Red Jasper","Carnelian","Lapis Lazuli","Garnet","Amazonite","Rhodochrosite","Labradorite","Blood Stone","Blue Tiger Eye","Green Tiger Eye","Black Obsidian","7 Chakra","Sunstone","Red Tiger Eye","Sodalite","Triple Protection","Pyrite","Sulemani Hakeek","Turquoise (Real)","Multi Fluorite","Black Tourmaline","Citrine","Money Magnet Combination","Pichu","Rainbow Moonstone","Smoky Quartz"]],["Crystal Trees","Sizes: 150, 300, 500 & 700 beads","",["Seven Chakra Tree","Money Magnet Tree"]],["Crystal Trees","Sizes: 150, 300, 500 & 700 beads"," Tree",["Amethyst","Lapis Lazuli","Green Aventurine","Citrine","Clear Quartz","Rainbow Moonstone","Red Carnelian","Black Tourmaline","Green Jade","Tiger Eye","Rose Quartz with Amethyst"]],["Orgone Pyramids","Orgone pyramid · 80–90 mm"," Orgone Pyramid",["Seven Chakra","Rudraksha","Rose Quartz","Citrine","Black Tourmaline","Gomti Chakra","Amethyst","Green Jade","Green Aventurine","Red Jasper","Rainbow Moonstone"]],["Crystal Pyramids","Sizes: 1 in, 2 in, 3 in & above"," Pyramid",["Rose Quartz","Amethyst","Tiger Eye","Selenite","Red Jasper","Lapis Lazuli","Green Aventurine","Black Tourmaline","Pyrite","Green Jade","Clear Quartz","Moonstone","Blood Stone","Carnelian","Yellow Aventurine"]],["Raw Stones","Natural raw stone · sold by weight"," Raw Stone",["Amethyst","Selenite","Black Tourmaline","Pyrite","Tiger Eye","Carnelian","Rose Quartz","Lapis Lazuli","Clear Quartz","Green Aventurine","Yellow Aventurine"]],["Tumble Stones","Polished tumble · per piece or by weight"," Tumble",["Tiger Eye","Rose Quartz","Lapis Lazuli","Amethyst","Citrine","Moonstone","Sulemani","Red Jasper","Yellow Aventurine","Amazonite","Labradorite","Hematite","Green Aventurine","Selenite","Pyrite","Sunstone","Carnelian","Green Jade","Clear Quartz","Black Tourmaline"]],["Crystal Balls","Crystal sphere · sold by weight"," Ball",["Rose Quartz","Amethyst","Red Jasper","Tiger Eye","Lapis Lazuli","Green Jade","Moonstone","Lava","Green Aventurine","Ruby Zoisite","Ruby Kyanite","Pyrite","Labradorite","Selenite","Garnet","Clear Quartz","Black Obsidian","Multi Fluorite","Carnelian","Yellow Calcite"]],["Crystal Towers","Sizes: 3 in, 4 in, 5 in & above"," Tower",["Clear Quartz","Rose Quartz","Lapis Lazuli","Amethyst","Green Aventurine","Tiger Eye","Selenite","Pyrite","Moonstone","Green Jade","Yellow Aventurine","Red Jasper","Black Obsidian"]],["Crystal Angels","Sizes: 1 in, 2 in, 3 in"," Angel",["Rose Quartz","Lapis Lazuli","Red Jasper","Amethyst","Tiger Eye","Yellow Aventurine","Moonstone","Green Aventurine","Pyrite","Black Tourmaline","Carnelian","Selenite"]],["Crystal Hearts","Polished heart · sold by weight"," Heart",["Moonstone","Rose Quartz","Amethyst","Clear Quartz","Selenite"]],["Zibu Coins","Engraved Zibu symbol · per piece"," Zibu Coin",["Rose Quartz","Pyrite","Jade"]],["Selenite & Fossils","Charging plate for crystals & jewellery","",["Selenite Charging Plate"]],["Selenite & Fossils","Natural fossil","",["Kuber (Orthoceras) Fossil","Ammonite Fossil","Kuber Tower (Orthoceras)"]],["Family Crystals","Crystal cluster · sold by weight"," Family Crystal",["Smoky Quartz","Citrine","Clear Quartz","Green Phantom"]],["Palm Stones","Smooth palm / soap stone"," Palm Stone",["Clear Quartz","Selenite","Amethyst","Lapis Lazuli"]],["Himalayan Salt Lamps","Natural Himalayan rock salt"," Salt Lamp",["Natural","Pyramid","Ball","Cylinder"]],["Crystal Crush","Crystal chips · sold by weight"," Crystal Crush",["Lapis Lazuli","Amethyst","Clear Quartz","Green Aventurine","Carnelian","Green Jade"]]];
+const PHOTO=CATALOG.flatMap(([cat,d,suf,names])=>names.map(x=>({n:x+suf,d,cat,img:'img/'+slug(x+suf)+'.jpg'})));
+const EXTRA=[
+ {n:"Amethyst Chips Bracelet",d:"Calm & spiritual growth",e:"📿",cat:"Gifts & Jewellery"},
+ {n:"Rose Quartz Ring",d:"Raw stone, wire-wrapped",e:"💍",cat:"Gifts & Jewellery"},
+ {n:"Raw Crystal Pendants",d:"Natural crystals on a chain",e:"💎",cat:"Gifts & Jewellery"},
+ {n:"Love Mojo Bag",d:"Herbs & crystals for love",e:"👝",cat:"Oils & Mojo Bags"},
+ {n:"Money Oil",d:"Ritual oil for prosperity",e:"🧴",cat:"Oils & Mojo Bags"},
+ {n:"Manifestation Oil",d:"Ritual oil with dried flowers",e:"🌸",cat:"Oils & Mojo Bags"}
 ];
+const shop=GEMS.concat(PHOTO,EXTRA);
+const ORDER=["Gemstones", "Crystal Bracelets", "Crystal Trees", "Orgone Pyramids", "Crystal Pyramids", "Crystal Towers", "Crystal Balls", "Crystal Angels", "Crystal Hearts", "Tumble Stones", "Raw Stones", "Family Crystals", "Palm Stones", "Zibu Coins", "Selenite & Fossils", "Himalayan Salt Lamps", "Crystal Crush", "Gifts & Jewellery", "Oils & Mojo Bags"];
 const sizes=[3,4,5,6,7,8];
-let filt="All";
-const cats=["All",...new Set(shop.map(s=>s.cat))];
-function renderFilters(){document.getElementById('filters').innerHTML=cats.map(c=>`<button class="${c===filt?'on':''}" onclick="filt='${c}';renderFilters();renderShop()">${c}</button>`).join('');}
-function beads(cols){const n=16,r=30,out=[];for(let k=0;k<n;k++){const t=k/n*2*Math.PI,x=40+r*Math.cos(t),y=40+r*Math.sin(t),col=cols[k%cols.length];out.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6.2" fill="${col}"/><circle cx="${(x-1.8).toFixed(1)}" cy="${(y-2).toFixed(1)}" r="1.8" fill="#fff" opacity=".45"/>`);}return `<svg class="bead" viewBox="0 0 80 80" width="80" height="80">${out.join('')}</svg>`;}
-function visual(g){if(g.b)return beads(g.b);if(g.e)return `<div class="ico2">${g.e}</div>`;return `<div class="stone" style="background:radial-gradient(circle at 35% 30%,#fff8,${g.c} 55%,#0006)"></div>`;}
+let filt="All",q="",shown=24;
+function renderFilters(){const cats=["All"].concat(ORDER.filter(c=>shop.some(s=>s.cat===c)));document.getElementById('filters').innerHTML=cats.map(c=>`<button class="${c===filt?'on':''}" onclick="filt='${c.replace(/'/g,"\\'")}';shown=24;renderFilters();renderShop()">${c}${c==='All'?'':` <small>${shop.filter(s=>s.cat===c).length}</small>`}</button>`).join('');}
+function visual(g){if(g.img)return `<div class="ph"><img src="${g.img}" alt="${g.n}" loading="lazy"></div>`;if(g.e)return `<div class="ico2">${g.e}</div>`;return `<div class="stone" style="background:radial-gradient(circle at 35% 30%,#fff8,${g.c} 55%,#0006)"></div>`;}
+function list(){const qq=q.trim().toLowerCase();return shop.map((g,i)=>({g,i})).filter(({g})=>(filt==="All"||g.cat===filt)&&(!qq||(g.n+' '+g.cat+' '+(g.d||'')).toLowerCase().includes(qq)));}
 function renderShop(){
- document.getElementById('gemgrid').innerHTML=shop.map((g,i)=>{ if(filt!=="All"&&g.cat!==filt)return"";
-  const top=`${visual(g)}<h3>${g.n}</h3>${g.h?`<div class="hi">${g.h}</div>`:''}<p>${g.d}${g.b&&g.cat==="Crystal Bracelets"?' · 8mm':''}</p>`;
+ const L=list();
+ document.getElementById('gemgrid').innerHTML=L.slice(0,shown).map(({g,i})=>{
   const sel=g.ratti?`<select id="sz${i}">${sizes.map(s=>`<option value="${s}">${s} Ratti (≈${(s*0.91).toFixed(1)} ct)</option>`).join('')}</select>`:'';
-  const pr=g.price!=null?inr(g.price):"Ask for price";
-  return `<div class="gem">${top}${sel}<div class="pr">${pr}</div><div class="row2" style="margin-top:10px"><button class="btn btn-gold" onclick="addItem(${i})">${g.price!=null?"Add to cart":"Add to list"}</button><a class="btn btn-ghost" target="_blank" href="${wa(g.ratti?"Namaste, I want to know which "+g.n+" is right for my chart.":"Namaste, I want to enquire about "+g.n)}">Ask</a></div></div>`;
- }).join('');
+  return `<div class="gem">${visual(g)}<h3>${g.n}</h3>${g.h?`<div class="hi">${g.h}</div>`:''}<p>${g.d||''}</p>${sel}<div class="pr">Ask for price</div><div class="row2"><button class="btn btn-gold" onclick="addItem(${i})">Add to list</button><a class="btn btn-ghost" target="_blank" href="${wa(g.ratti?"Namaste, I want to know which "+g.n+" is right for my chart.":"Namaste, please share price and details of "+g.n)}">Ask</a></div></div>`;
+ }).join('')||'<p style="text-align:center;color:#e6c98a;grid-column:1/-1">No products found.</p>';
+ const more=document.getElementById('more');more.style.display=L.length>shown?'inline-block':'none';more.textContent=`Show more (${L.length-shown} more)`;
 }
 renderFilters();renderShop();
 
